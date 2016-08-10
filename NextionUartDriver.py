@@ -15,7 +15,7 @@ The NextionUArtDriver is a library for the Nextion LCD Display controlled by a p
 # with NETION marked comments reffer to http://wiki.iteadstudio.com/Nextion_Instruction_Set#Nextion_HMI:_System_Variables_List
 
 from  pyb import UART
-class NetiionDisplay():
+class NextionDisplay:
     '''
     NetiionDisplay constructor arguments
     1. UART chose the UART from the pyboard
@@ -32,16 +32,13 @@ class NetiionDisplay():
         '''sends a string as raw data'''
         data = data + self.endCmdff
         return self.uart.write(data)
-        
+
     def readRaw(self):
         '''reads a string as raw data'''
         cnt = 0
-        data = []
-        file = open('log/log.txt', 'w')
-        
+
         data.append(self.uart.read())
         x=0
-        file.write(str(data[x]))
         while cnt < 3:
             data.append(self.uart.read())
             if data[len(data)-1]== 0xff:
@@ -49,11 +46,9 @@ class NetiionDisplay():
             else:
                 cnt = 0
             x=x+1
-            file.write(data[x])
-        file.close()    
         return data
-        
-    def readComandsBack(self):            
+
+    def readComandsBack(self):
         '''
         Table 1: serial l instruction execution success or failure notification format
 
@@ -151,7 +146,7 @@ class NetiionDisplay():
         This funktion sets the selected page to the front
         '''
         self.sendRaw("page %s" %(PageID))
-        
+
     def refreshcmpID(self, ComponentID = "0"):
         '''NETION 
         ComponentID: component ID or component name 
@@ -164,7 +159,7 @@ class NetiionDisplay():
         If you refresh one of the components,the component will be on the first top,but covers the others.Use this command "ref 0" will be work well. 
         '''
         self.sendRaw("ref %s" %(ComponentID))
- 
+
     def refObJname(self, Jname = "0"):
         '''NETION 
         Jname: component name 
@@ -176,8 +171,8 @@ class NetiionDisplay():
         2.When creating a component in Nextion editor, the default loading mode is auto loading. When the loading mode is set as manual loading, it requires to use ref to load. When the component is sheltered by GUI command mapping, or when the component is sheltered by other manual loading components, you can use ref to refresh the component. 
         '''
         self.sendRaw("ref %s" %(Jname))
- 
- 
+
+
     def refStop (self):
         '''NETION 
         stop refreshing screen 
@@ -191,7 +186,7 @@ class NetiionDisplay():
         3.When stop refreshing the screen, ref command will still be executed. Besides, all GUI drawing instructions such as draw point, draw line will still be executed and any changes will be immediately displayed. 
         '''
         self.sendRaw("ref_stop")
-    
+
     def refStar (self):
         '''NETION 
         recover refreshing screen 
@@ -201,7 +196,7 @@ class NetiionDisplay():
         This command should be used with ref_stop command. 
         '''
         self.sendRaw("ref_star")
- 
+
     def getAtt(self,  Attribute = ""):
         '''NETION 
         return the attribute of a object
@@ -219,32 +214,32 @@ class NetiionDisplay():
     def sendme(self):
         '''NETION 
         If you want the page auto-send pageID every refresh, simply enter sendme in page initialize event. 
-        ''' 
+        '''
         self.sendRaw("sendme")
-        
+
     def cov(self, From = "", To = "",  Length = "0"):
-        '''NETION 
+        '''NETION
         cov("att1", "att2", Length = "lenth")       #converts the value from one objekt to another
 
         att1: source variable
         att2: target variable
-        lenth: length of the string(0 is automatic length, not- 0 is fixed length)          
+        lenth: length of the string(0 is automatic length, not- 0 is fixed length)
         cov(From = "h0.val", To = "t0.txt", 0)
-        
+
         1.lenth always represents the length of the string, when the value converts into string, it is the length of target variable; when the string converts into value, it is the length of source variable.
 
-        2. If the target variable and source variable are of the same type, the conversion failed.      
+        2. If the target variable and source variable are of the same type, the conversion failed.
         '''
-        self.sendRaw("cov %s,%s,%d" %(From,  To,  Length)) 
+        self.sendRaw("cov %s,%s,%d" %(From,  To,  Length))
 
- 
-    def touchJ(self): 
+
+    def touchJ(self):
         '''NETION 
         calibrate touch 
         All the devices have been calibrated before packing from the factory, this command is not needed under normal circumstances 
         '''
-        self.sendRaw("touch_j") 
- 
+        self.sendRaw("touch_j")
+
     def visisble(self, Component = "255",  State = "1"):
         '''NETION 
         vis;hide/show component
@@ -257,15 +252,15 @@ class NetiionDisplay():
 
         1.The first parameter 255 means all components in current page, for example: vis 255,0 (hide all components in current page); vis 255,1 (show all components in current page). 
         '''
-        self.sendRaw("vis %s,%s" %(Component, State)) 
+        self.sendRaw("vis %s,%s" %(Component, State))
 
-    def clearTouch(self):  
+    def clearTouch(self):
         '''NETION 
         clearTouch()        #disables the touch of the active area
         
         When you use this command, all touch areas you set in the current page will neither be valid, nor automatically be identified.Until you use the "page" command, the touch areas can be reloaded. 
         '''
-        self.sendRaw("cle_c") 
+        self.sendRaw("cle_c")
 
     def setTouchOfObj(self, Component = "255", State = "1"):
         '''NETION 
@@ -278,8 +273,8 @@ class NetiionDisplay():
         
         1.The first parameter 255 means all components in current page, for example: setTouchOfObj( Component = "255", State = "0" (all components in current page touch invalid); tsw 255, 1 (all components in current page touch valid). 
         '''
-        self.sendRaw("tsw %s,%s"%(Component, State)) 
-        
+        self.sendRaw("tsw %s,%s"%(Component, State))
+
     def comStop(self):
         '''NETION 
         This command is used for pausing the execution of serial port commands, but note that the device will continue receiving the commands and store them in the buffer. Until receiving "com_star" commands, the device will execute the rest commands that store in the buffer.
@@ -289,7 +284,7 @@ class NetiionDisplay():
         When using this command to pause the execution, please make sure whether the buffer size and the maximum capacity of command queue can store all the commands you need. You will find these two parameter in Nextion Hardware manual. 
         '''
         self.sendRaw("com_stop")
-        
+
     def comStart(self):
         '''NETION 
         After receiving this command, the device will execute all the commands that store in the buffer.
@@ -321,7 +316,7 @@ class NetiionDisplay():
         '''
         self.sendRaw("code _c")
 
-    
+
     # print
     #printh 
     #are only used by the Display
@@ -340,63 +335,63 @@ class NetiionDisplay():
         '''
         self.sendRaw("add %s,%s,%s" %(ComponentID, Chanel, Value))
 
-    def addValueToWaveformTroughtput(self,  ComponentID = "0",  Chanel = "0",  NumerOfValues = "10"):
-        '''NETION 
-        Waveform data pass through command
-          
-        addValueToWaveformTroughtput(cmpID, ch, qyt)
-        ComponentID: waveform component ID
-        Chanel: channel number in waveform component
-        NumerOfValues: adopted point quantity of the data
+        def addValueToWaveformTroughtput(self,  ComponentID = "0",  Chanel = "0",  NumerOfValues = "10"):
+            '''NETION
+            Waveform data pass through command
 
-        addt 1, 0, 100  #waveform component whose ID is 1 enter into data pass through mode, pass through adopted point quantity is 100
+            addValueToWaveformTroughtput(cmpID, ch, qyt)
+            ComponentID: waveform component ID
+            Chanel: channel number in waveform component
+            NumerOfValues: adopted point quantity of the data
 
-        1.Waveform component only support 8-bit values, 0 minimum, 255 maximum. Single pass through is 1024 bits maximum.
+            addt 1, 0, 100  #waveform component whose ID is 1 enter into data pass through mode, pass through adopted point quantity is 100
 
-        2.After sending waveform data pass through command, it will take some time to get the device responded and started passing through values. This period takes about 5ms(it will take longer if there are other commands to be executed in the buffer zone before executing data pass through command). Following this period, it will send a data pass through ready data(0XFE+Terminator) to user, then it will start sending pass through data. The data being passed are only hexadecimal numbers. It recovers to command receiving state only after the device has adopted specified data.
+            1.Waveform component only support 8-bit values, 0 minimum, 255 maximum. Single pass through is 1024 bits maximum.
 
-        3.Waveform will not refresh until specified data has been passed through completely. 
-        '''
-        self.sendRaw("addt %s,%s,%s" %(ComponentID, Chanel, NumerOfValues))
+            2.After sending waveform data pass through command, it will take some time to get the device responded and started passing through values. This period takes about 5ms(it will take longer if there are other commands to be executed in the buffer zone before executing data pass through command). Following this period, it will send a data pass through ready data(0XFE+Terminator) to user, then it will start sending pass through data. The data being passed are only hexadecimal numbers. It recovers to command receiving state only after the device has adopted specified data.
 
-    def reset(self):
-        '''resets the display'''
-        self.sendRaw("reset")
-        
+            3.Waveform will not refresh until specified data has been passed through completely.
+            '''
+            self.sendRaw("addt %s,%s,%s" %(ComponentID, Chanel, NumerOfValues))
 
+        def reset(self):
+            '''resets the display'''
+            self.sendRaw("reset")
 
 
-#----------------------------------------------------------------------------------------
-#Classification II: GUI Designing Command
-#----------------------------------------------------------------------------------------
 
-    def clsColor(self, ColorByName = "",  ColorByValue = 0):
-        ''''
-        Note: When you can’t realize some special GUI designing in Nextion Editor, you can use some GUI commands to make it happen. Generally, the controls in Nextion editor can satisfy your GUI designing demand.
-        cls color
-        Sets the whole screen to the selected color
-        
-        clsColor(self, ColorByName = "BLACK")       #sets the screen to black
-        clsColor(self,  ColorByValue = 65535)           #sets the screen to white
-        
-        You can define color by name or by value
-        Name is more prior
-        
-        Names and also there Values are all other values (0-65535) are possible: Black = 0 White is 65535
-        RED 	63488 	
-        BLUE 	31 	
-        GRAY 	33840 	
-        BLACK 	0 	
-        WHITE 	65535 	
-        GREEN 	2016 	
-        BROWN 	48192 	
-        YELLOW 	65504 	 
-        
-        '''
-        if ColorByName != "":
-            self.sendRaw("cls %s" %(ColorByName))
-        else : 
-            self.sendRaw("cls %d" %(ColorByValue))
+
+        #----------------------------------------------------------------------------------------
+        #Classification II: GUI Designing Command
+        #----------------------------------------------------------------------------------------
+
+        def clsColor(self, ColorByName = "",  ColorByValue = 0):
+            ''''
+            Note: When you can’t realize some special GUI designing in Nextion Editor, you can use some GUI commands to make it happen. Generally, the controls in Nextion editor can satisfy your GUI designing demand.
+            cls color
+            Sets the whole screen to the selected color
+
+            clsColor(self, ColorByName = "BLACK")       #sets the screen to black
+            clsColor(self,  ColorByValue = 65535)           #sets the screen to white
+
+            You can define color by name or by value
+            Name is more prior
+
+            Names and also there Values are all other values (0-65535) are possible: Black = 0 White is 65535
+            RED 	63488
+            BLUE 	31
+            GRAY 	33840
+            BLACK 	0
+            WHITE 	65535
+            GREEN 	2016
+            BROWN 	48192
+            YELLOW 	65504
+
+            '''
+            if ColorByName != "":
+                self.sendRaw("cls %s" %(ColorByName))
+            else :
+                self.sendRaw("cls %d" %(ColorByValue))
             
 
 
