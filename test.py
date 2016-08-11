@@ -44,26 +44,36 @@ class test():
     def run(self):
 
         while True:
-                self.display.addValueToWaveform("1", "0", "127")
                 pyb.LED(4).toggle()
                 #self.q = mpu.sensors()
-                self.X = self.kalmanX.getAngle(math.atan2(self.mpu.accel.y, self.mpu.accel.z), self.mpu.gyro.x, self.timeX-pyb.micros())
                 self.led2.off()
                 self.led3.off()
                 self.led4.off()
 
                 #if (math.atan2(self.mpu.accel.x, self.mpu.accel.y)*180/math.pi) > 45:
+                self.X = self.kalmanX.getAngle(math.atan2(self.mpu.accel.y, self.mpu.accel.z), self.mpu.gyro.x, self.timeX-pyb.micros())
                 if (self.X*180/math.pi) > 0:
                     self.led2.on()
-                self.Y = self.kalmanY.getAngle(math.atan2(self.mpu.accel.x, self.mpu.accel.z), self.mpu.gyro.y, self.timeX-pyb.micros())
+                X = ((self.X*180.0)/math.pi)/2.0+127
+                X = 127
+                dispX = ("%d%d%d" %(X/100, (X%100/10), (X%10)))
+                self.display.addValueToWaveform("1", "0", dispX)
 
+                self.Y = self.kalmanY.getAngle(math.atan2(self.mpu.accel.x, self.mpu.accel.z), self.mpu.gyro.y, self.timeX-pyb.micros())
                 if (self.Y*180/math.pi) > 0:
                     self.led3.on()
-                self.Z = self.kalmanZ.getAngle(math.atan2(self.mpu.accel.x, self.mpu.accel.y), self.mpu.gyro.z, self.timeX-pyb.micros())
+                Y = ((self.Y*180.0)/math.pi)/2.0+127
+                dispY = ("%d%d%d" %( Y/100, (Y%100/10), (Y%10)))
+                self.display.addValueToWaveform("1", "1", dispY)
 
+                self.Z = self.kalmanZ.getAngle(math.atan2(self.mpu.accel.x, self.mpu.accel.y), self.mpu.gyro.z, self.timeX-pyb.micros())
                 if (self.Z*180/math.pi) > 0:
                     self.led4.on()
-                #X = kalmanX.getAngle(math.atan2(2, 1), 30, timeX-pyb.micros())
+                Z = ((self.Z*180.0)/math.pi)/2.0+127
+                dispZ = ("%d%d%d" %(Z/100, (Z%100/10), (Z%10)))
+                self.display.addValueToWaveform("1", "2", dispZ)
+
+#X = kalmanX.getAngle(math.atan2(2, 1), 30, timeX-pyb.micros())
                 #com1.write('angle %.4f'%(1))
                 #com1.write("angle test\n")
                 self.timeX = pyb.micros()
